@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BIT Unified Academic Management Dashboard
 
 A centralized academic ERP and learning management platform designed to unify multiple institutional portals into a single intelligent dashboard for students, faculty, and administrators.
@@ -83,3 +84,6 @@ npm run dev
 ```
 
 Your centralized academic ERP and learning management dashboard should now be running locally.
+=======
+# bit-academic-dashboard
+>>>>>>> 145d47f5c3f921b5d9fa035422fb41198047d07c
