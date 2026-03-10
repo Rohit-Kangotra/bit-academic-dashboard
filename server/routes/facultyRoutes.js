@@ -11,5 +11,6 @@ router.get('/schedule', facultyController.getSchedule);
 router.get('/projects', facultyController.getProjects);
 router.get('/students', facultyController.getStudents);
 router.get('/mentees', facultyController.getMyMentees);
+router.get('/student/:rollNo', facultyController.getStudentProfile);
 
 module.exports = router;

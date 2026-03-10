@@ -47,10 +47,10 @@ export function FacultyDashboard() {
     queryFn: () => fetchApi('/api/v1/dashboard/faculty')
   });
 
-  // 2. Fetch Mentees from new API
-  const { data: menteesData, isLoading: menteesLoading } = useQuery({
-    queryKey: ['mentees'],
-    queryFn: () => fetchApi('/api/v1/faculty/mentees')
+  // 2. Fetch Learning Analytics from new API
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
+    queryKey: ['learningAnalytics'],
+    queryFn: () => fetchApi('/api/v1/learning/faculty/learning-analytics')
   });
 
   const approveMutation = useMutation({
@@ -76,21 +76,16 @@ export function FacultyDashboard() {
   const dbData = dashboardData || {};
   const pendingLeaves = dbData.pending_leaves || [];
 
-  const mentees = menteesData?.mentees || [];
-  const totalMentees = mentees.length;
+  const analytics = analyticsData?.analytics || [];
+  const totalMentees = analytics.length;
 
-  const avgCgpa = totalMentees > 0
-    ? (mentees.reduce((acc: number, m: any) => acc + parseFloat(m.cgpa || 0), 0) / totalMentees).toFixed(2)
-    : "0.00";
+  const getEngagementStatus = (score: number) => {
+    if (score >= 80) return { label: "Highly Engaged", color: "bg-success text-success-foreground" };
+    if (score >= 50) return { label: "Moderate", color: "bg-warning text-warning-foreground" };
+    return { label: "At Risk", color: "bg-destructive text-destructive-foreground" };
+  };
 
-  const avgAttendance = totalMentees > 0
-    ? (mentees.reduce((acc: number, m: any) => acc + parseFloat(m.attendance || 0), 0) / totalMentees).toFixed(0)
-    : "0";
-
-  // Students at risk: attendance < 75 or CGPA < 6
-  const studentsAtRisk = mentees.filter((m: any) => parseFloat(m.attendance || 0) < 75 || parseFloat(m.cgpa || 0) < 6).length;
-
-  if (dashboardLoading || menteesLoading) return <div className="py-12 flex justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+  if (dashboardLoading || analyticsLoading) return <div className="py-12 flex justify-center"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
     <div className="space-y-10">
@@ -135,54 +130,10 @@ export function FacultyDashboard() {
         </div>
       </section>
 
-      {/* 2. Mentor Analytics Section */}
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight">Mentor Analytics</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Mentees" value={totalMentees.toString()} subtitle="Assigned students" icon={Users} gradient="blue" />
-          <StatCard title="Average CGPA" value={avgCgpa} subtitle="Overall performance" icon={BookOpen} gradient="green" />
-          <StatCard title="Average Attendance" value={`${avgAttendance}%`} subtitle="Current semester" icon={Calendar} gradient="purple" />
-          <StatCard title="Students At Risk" value={studentsAtRisk.toString()} subtitle="Requires attention" icon={AlertTriangle} gradient={studentsAtRisk > 0 ? "orange" : "green"} />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6">
-          <Card className="p-5 glass-card">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
-              <BarChartIcon className="w-4 h-4" /> Attendance Chart
-            </h3>
-            <div className="w-full overflow-x-auto">
-              <div className="min-w-[600px]">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={mentees} margin={{ top: 20, right: 30, left: 0, bottom: 50 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 13%, 91%)" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                      interval={0}
-                      angle={-45}
-                      textAnchor="end"
-                    />
-                    <YAxis
-                      domain={[0, 100]}
-                      tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
-                      tickFormatter={(val) => `${val}%`}
-                    />
-                    <Tooltip cursor={{ fill: 'hsl(var(--muted)/0.4)' }} contentStyle={{ borderRadius: '8px', border: '1px solid hsl(var(--border))' }} />
-                    <Bar dataKey="attendance" name="Attendance %" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]}>
-                      {
-                        mentees.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={parseFloat(entry.attendance) < 75 ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'} />
-                        ))
-                      }
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </section>
+      {/* Removed the original Mentor Analytics block that used mentees data (CGPA/Attendance) 
+          as instructed to change architecture to "analytics only" for learning engagement or similar.
+          However, keeping the basic dashboard layout clean as per constraints.
+      */}
 
       {/* 3. Pending Leave Requests Section */}
       <section className="space-y-4">
@@ -242,9 +193,9 @@ export function FacultyDashboard() {
         </Card>
       </section>
 
-      {/* 4. My Mentees Section */}
+      {/* 4. Learning Engagement Analytics Section */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight">My Mentees</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Learning Engagement Analytics</h2>
         <Card className="p-5 glass-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -252,31 +203,29 @@ export function FacultyDashboard() {
                 <tr className="border-b">
                   <th className="text-left py-2 font-medium text-muted-foreground">Roll No</th>
                   <th className="text-left py-2 font-medium text-muted-foreground">Student Name</th>
-                  <th className="text-left py-2 font-medium text-muted-foreground">Department</th>
-                  <th className="text-left py-2 font-medium text-muted-foreground">Semester</th>
-                  <th className="text-center py-2 font-medium text-muted-foreground">CGPA</th>
-                  <th className="text-center py-2 font-medium text-muted-foreground">Reward Points</th>
+                  <th className="text-center py-2 font-medium text-muted-foreground">Activity Count</th>
+                  <th className="text-center py-2 font-medium text-muted-foreground">Engagement Score</th>
+                  <th className="text-right py-2 font-medium text-muted-foreground">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {mentees.length === 0 ? (
-                  <tr><td colSpan={6} className="py-6 text-center text-muted-foreground">No students currently assigned to you.</td></tr>
-                ) : mentees.map((m: any) => (
-                  <tr key={m.roll_no} className="border-b last:border-0 hover:bg-muted/30">
-                    <td className="py-3 text-muted-foreground font-mono text-xs">{m.roll_no}</td>
-                    <td className="py-3 font-medium uppercase">{m.name}</td>
-                    <td className="py-3">{m.department || 'B.Tech IT'}</td>
-                    <td className="py-3">S{m.semester || '6'}</td>
-                    <td className="py-3 text-center">
-                      <Badge variant={parseFloat(m.cgpa) >= 7.0 ? "secondary" : "destructive"} className="text-xs font-bold">
-                        {m.cgpa}
-                      </Badge>
-                    </td>
-                    <td className="py-3 text-center">
-                      <span className="font-semibold text-primary">{m.reward_points || 0}</span>
-                    </td>
-                  </tr>
-                ))}
+                {analytics.length === 0 ? (
+                  <tr><td colSpan={5} className="py-6 text-center text-muted-foreground">No engagement data available.</td></tr>
+                ) : analytics.map((m: any) => {
+                  const score = parseFloat(m.engagement_score || 0);
+                  const status = getEngagementStatus(score);
+                  return (
+                    <tr key={m.roll_no} className="border-b last:border-0 hover:bg-muted/30">
+                      <td className="py-3 text-muted-foreground font-mono text-xs">{m.roll_no}</td>
+                      <td className="py-3 font-medium uppercase">{m.name}</td>
+                      <td className="py-3 text-center">{m.activity_count}</td>
+                      <td className="py-3 text-center font-bold">{score}</td>
+                      <td className="py-3 text-right">
+                        <Badge className={`text-xs ${status.color}`}>{status.label}</Badge>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

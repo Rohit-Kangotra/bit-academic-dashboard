@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS syllabus_tracking CASCADE;
 DROP TABLE IF EXISTS resumes CASCADE;
 DROP TABLE IF EXISTS courses CASCADE;
 DROP TABLE IF EXISTS course_lessons CASCADE;
+DROP TABLE IF EXISTS learning_activity CASCADE;
 DROP TABLE IF EXISTS course_progress CASCADE;
 DROP TABLE IF EXISTS students CASCADE;
 DROP TABLE IF EXISTS faculty CASCADE;
@@ -165,4 +166,13 @@ CREATE TABLE syllabus_tracking (
     total_units INTEGER NOT NULL DEFAULT 5,
     completed_units INTEGER NOT NULL DEFAULT 0,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create Learning Activity Table
+CREATE TABLE learning_activity (
+    id SERIAL PRIMARY KEY,
+    roll_no VARCHAR(50) NOT NULL,
+    course_code VARCHAR(100) NOT NULL,
+    activity_type VARCHAR(50) NOT NULL,
+    activity_time TIMESTAMP DEFAULT NOW()
 );

@@ -22,6 +22,8 @@ import Attendance from "./pages/Attendance";
 import Classroom from "./pages/Classroom";
 import Placements from "./pages/Placements";
 import ImportCenter from "./pages/ImportCenter";
+import Mentees from "./pages/faculty/Mentees";
+import FacultyStudentProfile from "./pages/faculty/FacultyStudentProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -89,6 +91,8 @@ const App = () => (
             <Route path="/attendance" element={<ProtectedRoute><Attendance /></ProtectedRoute>} />
             <Route path="/classroom" element={<ProtectedRoute><Classroom /></ProtectedRoute>} />
             <Route path="/placements" element={<ProtectedRoute><Placements /></ProtectedRoute>} />
+            <Route path="/faculty/mentees" element={<ProtectedRoute allowedRoles={['faculty']}><Mentees /></ProtectedRoute>} />
+            <Route path="/faculty/student/:rollNo" element={<ProtectedRoute allowedRoles={['faculty']}><FacultyStudentProfile /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
