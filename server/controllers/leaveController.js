@@ -60,6 +60,20 @@ const approveLeave = async (req, res, next) => {
         const { status } = req.body;
 
         const leave = await LeaveModel.updateApproval(id, status);
+
+        if (leave) {
+            // Find student's user_id to send notification
+            const studentRes = await db.query('SELECT user_id FROM students WHERE roll_no = $1', [leave.student_roll_no]);
+            if (studentRes.rows.length > 0) {
+                const NotificationModel = require('../models/notificationModel');
+                await NotificationModel.createNotification(
+                    studentRes.rows[0].user_id,
+                    `Leave Request ${status}`,
+                    `Your leave request for ${leave.leave_type} (${new Date(leave.from_date).toLocaleDateString()} to ${new Date(leave.to_date).toLocaleDateString()}) has been ${status.toLowerCase()}.`
+                );
+            }
+        }
+
         res.status(200).json({ message: 'Leave status updated', leave });
     } catch (error) {
         next(error);

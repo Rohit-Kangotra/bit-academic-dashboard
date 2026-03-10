@@ -125,11 +125,8 @@ export default function Leaves() {
                 <Label>To Date</Label>
                 <Input type="date" value={formData.toDate} onChange={(e) => setFormData(p => ({ ...p, toDate: e.target.value }))} />
               </div>
-              <div className="md:col-span-2 space-y-2">
-                <Label>Remarks</Label>
-                <Textarea placeholder="Reason for leave..." rows={3} value={formData.reason} onChange={(e) => setFormData(p => ({ ...p, reason: e.target.value }))} />
-              </div>
             </div>
+
             <div className="flex gap-3 mt-4">
               <Button onClick={handleSubmit} disabled={applyMutation.isPending}>{applyMutation.isPending ? 'Submitting...' : 'Submit Request'}</Button>
               <Button variant="outline" onClick={() => setShowForm(false)}>
@@ -168,8 +165,8 @@ export default function Leaves() {
                     <span className="font-medium text-sm">{l.leave_type}</span>
                     <Badge
                       className={`text-xs ${l.status?.toLowerCase() === "approved"
-                          ? "bg-success text-success-foreground"
-                          : l.status?.toLowerCase() === "rejected" ? "bg-destructive text-destructive-foreground" : "bg-warning text-warning-foreground"
+                        ? "bg-success text-success-foreground"
+                        : l.status?.toLowerCase() === "rejected" ? "bg-destructive text-destructive-foreground" : "bg-warning text-warning-foreground"
                         }`}
                     >
                       {l.status}

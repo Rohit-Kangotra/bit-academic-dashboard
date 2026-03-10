@@ -28,6 +28,10 @@ const getStudentDashboard = async (req, res, next) => {
         const completedLessons = parseInt(progressRes.rows[0].completed);
         const courseProgressPercentage = Math.round((completedLessons / totalLessons) * 100);
 
+        // Assignments (using activity submissions as proxy for assignments if no assignments table exists)
+        const assignmentsRes = await db.query("SELECT COUNT(*) as count FROM activity_submissions WHERE roll_no = $1 AND status = 'Pending'", [student.roll_no]);
+        const pendingAssignmentsCount = parseInt(assignmentsRes.rows[0].count);
+
         res.status(200).json({
             cgpa: student.cgpa,
             attendance: attendancePercentage,
@@ -35,7 +39,8 @@ const getStudentDashboard = async (req, res, next) => {
             placements_applied: applicationsCount,
             total_classes: totalClasses,
             present_classes: presentCount,
-            course_progress: courseProgressPercentage
+            course_progress: courseProgressPercentage,
+            pending_assignments: pendingAssignmentsCount
         });
     } catch (error) {
         next(error);

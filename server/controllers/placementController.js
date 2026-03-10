@@ -69,7 +69,7 @@ const applyForDrive = async (req, res, next) => {
 
         const drive = driveRes.rows[0];
 
-        if (student.cgpa < drive.eligibility_cgpa) {
+        if (parseFloat(student.cgpa) < parseFloat(drive.eligibility_cgpa)) {
             return res.status(400).json({ message: `Ineligible. Requires ${drive.eligibility_cgpa} CGPA.` });
         }
 

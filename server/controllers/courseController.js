@@ -1,4 +1,5 @@
 const CourseModel = require('../models/courseModel');
+const db = require('../config/db');
 
 const getAllCourses = async (req, res, next) => {
     try {
@@ -54,6 +55,13 @@ const markLessonComplete = async (req, res, next) => {
         }
 
         const result = await CourseModel.markLessonComplete(roll_no, course_code, lesson_id);
+
+        // Also log real-time learning activity
+        await db.query(
+            "INSERT INTO learning_activity (roll_no, course_code, activity_type) VALUES ($1, $2, $3)",
+            [roll_no, course_code, 'lesson_completed']
+        );
+
         res.status(200).json({ message: 'Lesson marked as complete', progress: result });
     } catch (error) {
         next(error);

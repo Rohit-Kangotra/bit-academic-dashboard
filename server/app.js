@@ -34,6 +34,7 @@ app.use('/api/v1/courses', require('./routes/courseRoutes'));
 app.use('/api/v1/activity', require('./routes/activityRoutes'));
 app.use('/api/v1/dashboard', require('./routes/dashboardRoutes'));
 app.use('/api/v1/learning', require('./routes/learningRoutes'));
+app.use('/api/v1/notifications', require('./routes/notificationRoutes'));
 
 // Error handling middleware
 app.use(errorHandler);

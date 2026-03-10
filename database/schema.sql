@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS courses CASCADE;
 DROP TABLE IF EXISTS course_lessons CASCADE;
 DROP TABLE IF EXISTS learning_activity CASCADE;
 DROP TABLE IF EXISTS course_progress CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
 DROP TABLE IF EXISTS students CASCADE;
 DROP TABLE IF EXISTS faculty CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -175,4 +176,14 @@ CREATE TABLE learning_activity (
     course_code VARCHAR(100) NOT NULL,
     activity_type VARCHAR(50) NOT NULL,
     activity_time TIMESTAMP DEFAULT NOW()
+);
+
+-- Create Notifications Table
+CREATE TABLE notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT NOW()
 );
